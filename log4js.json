@@ -1,0 +1,5 @@
+{
+  "appenders": [
+  {"type": "console", "category": "console"} ],
+  "levels":{ "console": "DEBUG"}
+}
