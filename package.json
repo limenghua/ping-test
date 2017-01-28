@@ -1,0 +1,27 @@
+{
+  "name": "net-ping",
+  "version": "1.0.0",
+  "description": "for ping test",
+  "main": "app.js",
+  "dependencies": {
+    "log4js": "^1.1.0",
+    "net-ping": "^1.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/limenghua/ping-test.git"
+  },
+  "keywords": [
+    "ping"
+  ],
+  "author": "limenghua",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/limenghua/ping-test/issues"
+  },
+  "homepage": "https://github.com/limenghua/ping-test#readme"
+}

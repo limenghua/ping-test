@@ -2,15 +2,13 @@ const ping = require ("net-ping");
 const log4js = require("log4js");
 
 log4js.configure("./log4js.json");
-
 const logger = log4js.getLogger("console");
 
 var session = ping.createSession ();
 
-
-var arguments = process.argv.splice(2);
-
-var targets = arguments;
+const fs = require('fs');
+const file = ".\\targets.json";
+const targets = JSON.parse(fs.readFileSync(file));
 
 console.log(targets)
 
