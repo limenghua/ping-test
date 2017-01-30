@@ -9,22 +9,38 @@
 //
 
 #include "pinger.h"
+#include <vector>
+#include <string>
+#include <fstream>
+#include <boost/algorithm/string.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 
+void GetIpList(std::vector<std::string> & ips)
+{
+	boost::property_tree::ptree pt;
+	boost::property_tree::json_parser::read_json("./targets.json", pt);
+	boost::property_tree::xml_parser::write_xml("targets.xml", pt);
+
+	for (auto v : pt)
+	{
+		ips.push_back(v.second.data());
+	}
+}
 
 int main(int argc, char* argv[])
 {
+	std::vector<std::string> ips;
+	GetIpList(ips);
 	try
 	{
-		if (argc != 2)
-		{
-			std::cerr << "Usage: ping <host>" << std::endl;
-			std::cerr << "(You may need to run this program as root or adminstrator.)" << std::endl;
-
-			return 1;
-		}
-
 		boost::asio::io_service io_service;
-		pinger p(io_service, argv[1]);
+		for (auto ip : ips)
+		{
+			auto p = pinger::Create(io_service);
+			p->ping(ip.c_str());
+		}
 		io_service.run();
 	}
 	catch (std::exception& e)

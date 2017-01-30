@@ -13,6 +13,8 @@
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
+#include <boost/enable_shared_from_this.hpp>
+#include <boost/shared_ptr.hpp>
 #include <istream>
 #include <iostream>
 #include <ostream>
@@ -24,12 +26,21 @@ using boost::asio::ip::icmp;
 using boost::asio::deadline_timer;
 namespace posix_time = boost::posix_time;
 
-class pinger
+class pinger : public boost::enable_shared_from_this<pinger>
 {
 public:
-	pinger(boost::asio::io_service& io_service, const char* destination)
+	typedef boost::shared_ptr<pinger> Pointer;
+	static Pointer Create(boost::asio::io_service& io_service)
+	{
+		return Pointer(new pinger(io_service));
+	}
+	pinger(boost::asio::io_service& io_service)
 		: resolver_(io_service), socket_(io_service, icmp::v4()),
 		timer_(io_service), sequence_number_(0), num_replies_(0)
+	{
+	}
+
+	void ping(const char* destination)
 	{
 		icmp::resolver::query query(icmp::v4(), destination, "");
 		destination_ = *resolver_.resolve(query);//目标地址
@@ -63,7 +74,7 @@ private:
 		// Wait up to five seconds for a reply.
 		num_replies_ = 0;
 		timer_.expires_at(time_sent_ + posix_time::seconds(5));
-		timer_.async_wait(boost::bind(&pinger::handle_timeout, this));
+		timer_.async_wait(boost::bind(&pinger::handle_timeout, shared_from_this()));
 	}
 
 	void handle_timeout()
@@ -83,7 +94,7 @@ private:
 
 													// Wait for a reply. We prepare the buffer to receive up to 64KB.
 		socket_.async_receive(reply_buffer_.prepare(65536),//准备缓冲区
-			boost::bind(&pinger::handle_receive, this, _2));
+			boost::bind(&pinger::handle_receive, shared_from_this(), _2));
 	}
 
 	void handle_receive(std::size_t length)
