@@ -36,11 +36,14 @@ int main(int argc, char* argv[])
 	try
 	{
 		boost::asio::io_service io_service;
+		auto p = pinger::Create(io_service);
 		for (auto ip : ips)
-		{
-			auto p = pinger::Create(io_service);
-			p->ping(ip.c_str());
+		{	
+			p->ping(ip, [](const std::string & ip, const std::string & msg) {
+				std::cout << ip << "  " << msg << std::endl;
+			});
 		}
+		p->start();
 		io_service.run();
 	}
 	catch (std::exception& e)
